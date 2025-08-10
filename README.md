@@ -25,7 +25,7 @@ A clean project means less storage usage, smaller exports, faster loading times,
 ⚠️ Use with caution and always make a backup before using this tool!
 
 ## Bugs and/or improvements:
-[![Discord](https://img.shields.io/discord/705291584563839086)](https://discord.com/invite/tbv9zUyPpQ)
+[![Discord](https://img.shields.io/discord/705291584563839086?style=for-the-badge&logo=discord&label=Discord)](https://discord.com/invite/tbv9zUyPpQ)
 
 ## Wishlist my Game on Steam
 [![The Pale Piper](images/tpp.png)](https://store.steampowered.com/app/2925120/The_Pale_Piper/)
