@@ -2,6 +2,10 @@
 
 ![Godot Resource Cleaner](images/header.png)
 
+[![Godot Version](https://img.shields.io/badge/Godot-4.x-blue?style=for-the-badge&logo=godot-engine)](https://godotengine.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/YOUR_GITHUB_USERNAME/GodotResourceCleaner?style=for-the-badge)](https://github.com/YOUR_GITHUB_USERNAME/GodotResourceCleaner/releases)
+
 **Resource Cleaner is a simple but powerful add-on for [Godot 4.x](https://godotengine.org/) that helps you keep your project and export builds neat and lightweight.**
 
 ## What it does:
@@ -29,3 +33,6 @@ A clean project means less storage usage, smaller exports, faster loading times,
 
 ## 💖 Wishlist my game on Steam
 [![The Pale Piper](images/tpp.png)](https://store.steampowered.com/app/2925120/The_Pale_Piper/)
+
+## License
+Licensed under the MIT license, see `LICENSE` for more information.
