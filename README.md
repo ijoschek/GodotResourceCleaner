@@ -36,22 +36,26 @@ A clean project means less storage usage, smaller exports, faster loading times,
 ## Installation:
 
 ### Asset Library
+
 - In Godot, open the `AssetLib` tab.
 - Search and select "Godot Resource Cleaner".
 - Download and install the plugin.
 - Enable the plugin inside `Project > Project Settings > Plugins`.
 
 ### Github Releases
+
 - Download a [release build](https://github.com/ijoschek/GodotResourceCleaner/releases/).
 - Extract the zip file and place the `godotresourcecleaner` folder inside your project’s `addons` directory.
 - Enable the plugin inside `Project > Project Settings > Plugins`.
 
 ### Itch.io
+
 - Download on [itch.io](https://freetimedev.itch.io/godot-resource-cleaner)
 - Extract the zip file and place the `godotresourcecleaner` folder inside your project’s `addons` directory.
 - Enable the plugin inside `Project > Project Settings > Plugins`.
 
 ## Usage:
-![Screenshot](images/usage.png)
+
 - After enabling the plugin, open Godot Resource Cleaner from the top-right corner of the editor.
 - Once opened, you can start scanning your project for unused assets, add files to the Keep List, and clean your project efficiently.
+![Screenshot](images/usage.png)
