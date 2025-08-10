@@ -4,7 +4,7 @@
 
 [![Godot Version](https://img.shields.io/badge/Godot-4.x-blue?style=for-the-badge&logo=godot-engine)](https://godotengine.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/YOUR_GITHUB_USERNAME/GodotResourceCleaner?style=for-the-badge)](https://github.com/YOUR_GITHUB_USERNAME/GodotResourceCleaner/releases)
+[![GitHub release](https://img.shields.io/github/v/release/ijoschek/GodotResourceCleaner?style=for-the-badge)](https://github.com/ijoschek/GodotResourceCleaner/releases)
 [![Discord](https://img.shields.io/discord/705291584563839086?style=for-the-badge&logo=discord&label=Discord)](https://discord.com/invite/tbv9zUyPpQ)
 
 **Resource Cleaner is a simple but powerful add-on for Godot that helps you keep your project and export builds neat and lightweight.**
