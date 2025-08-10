@@ -38,7 +38,7 @@ A clean project means less storage usage, smaller exports, faster loading times,
 - In Godot, open the `AssetLib` tab.
 - Search for and select "Resource Cleaner".
 - Download and install the plugin.
-- Enable the plugin inside `Project/Project Settings/Plugins`.
+- Enable the plugin inside `Project > Project Settings > Plugins`.
 
 ### Github Releases
 - Download a [release build](https://github.com/ijoschek/GodotResourceCleaner/releases/).
