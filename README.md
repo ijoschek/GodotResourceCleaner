@@ -25,9 +25,27 @@ Over time, projects accumulate unused assets. Resource Cleaner helps you identif
 
 A clean project means less storage usage, smaller exports, faster loading times, and fewer headaches when collaborating or version control.
 
-## Disclaimer:
+## ⚠️ Disclaimer:
 
-⚠️ Use with caution and always make a backup before using this tool!
+Use with caution and always make a backup before using this tool!
 
 ## 💖 Wishlist my game on Steam
 [![The Pale Piper](images/tpp.png)](https://store.steampowered.com/app/2925120/The_Pale_Piper/)
+
+## Installation:
+
+### Asset Library
+- In Godot, open the `AssetLib` tab.
+- Search for and select "Resource Cleaner".
+- Download and install the plugin.
+- Enable the plugin inside `Project/Project Settings/Plugins`.
+
+### Github Releases
+- Download a [release build](https://github.com/ijoschek/GodotResourceCleaner/releases/).
+- Extract the zip file and move the `addons/godotresourcecleaner` directory into the project root location.
+- Enable the plugin inside `Project > Project Settings > Plugins`.
+
+### Itch.io
+- Download on [itch.io](https://freetimedev.itch.io/godot-resource-cleaner)
+- Extract the zip file and move the `addons/godotresourcecleaner` directory into the project root location.
+- Enable the plugin inside `Project > Project Settings > Plugins`.
