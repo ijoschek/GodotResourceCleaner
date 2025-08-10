@@ -27,7 +27,7 @@ A clean project means less storage usage, smaller exports, faster loading times,
 
 ## Disclaimer:
 
-Use with caution and always make a backup before using this tool! ⚠️
+⚠️ Use with caution and always make a backup before using this tool!
 
 ## 💖 Wishlist my game on Steam
 [![The Pale Piper](images/tpp.png)](https://store.steampowered.com/app/2925120/The_Pale_Piper/)
