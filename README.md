@@ -25,10 +25,6 @@ Over time, projects accumulate unused assets. Resource Cleaner helps you identif
 
 A clean project means less storage usage, smaller exports, faster loading times, and fewer headaches when collaborating or using version control.
 
-## Disclaimer:
-
-⚠️ Use with caution and always make a backup before using this tool!
-
 ## 💖 Wishlist my game on Steam
 
 [![The Pale Piper](images/tpp.png)](https://store.steampowered.com/app/2925120/The_Pale_Piper/)
@@ -61,3 +57,7 @@ A clean project means less storage usage, smaller exports, faster loading times,
 
 
 ![Usage](images/usage.png)
+
+## Disclaimer:
+
+⚠️ Use with caution and always make a backup before using this tool!
