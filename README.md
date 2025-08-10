@@ -36,7 +36,7 @@ Use with caution and always make a backup before using this tool! ⚠️
 
 ### Asset Library
 - In Godot, open the `AssetLib` tab.
-- Search for and select "Resource Cleaner".
+- Search and select "Resource Cleaner".
 - Download and install the plugin.
 - Enable the plugin inside `Project > Project Settings > Plugins`.
 
