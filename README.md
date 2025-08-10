@@ -52,5 +52,6 @@ A clean project means less storage usage, smaller exports, faster loading times,
 - Enable the plugin inside `Project > Project Settings > Plugins`.
 
 ## Usage:
+![Screenshot](images/usage.png)
 - After enabling the plugin, open Godot Resource Cleaner from the top-right corner of the editor.
 - Once opened, you can start scanning your project for unused assets, add files to the Keep List, and clean your project efficiently.
