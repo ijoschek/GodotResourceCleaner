@@ -7,7 +7,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/YOUR_GITHUB_USERNAME/GodotResourceCleaner?style=for-the-badge)](https://github.com/YOUR_GITHUB_USERNAME/GodotResourceCleaner/releases)
 [![Discord](https://img.shields.io/discord/705291584563839086?style=for-the-badge&logo=discord&label=Discord)](https://discord.com/invite/tbv9zUyPpQ)
 
-**Resource Cleaner is a simple but powerful add-on for [Godot 4.x](https://godotengine.org/) that helps you keep your project and export builds neat and lightweight.**
+**Resource Cleaner is a simple but powerful add-on for Godot that helps you keep your project and export builds neat and lightweight.**
 
 ## What it does:
 Over time, projects accumulate unused assets. Resource Cleaner helps you identify and remove these leftovers so your project stays lean and efficient.
@@ -29,11 +29,5 @@ A clean project means less storage usage, smaller exports, faster loading times,
 
 ⚠️ Use with caution and always make a backup before using this tool!
 
-## Report bugs or suggest improvements:
-
-
 ## 💖 Wishlist my game on Steam
 [![The Pale Piper](images/tpp.png)](https://store.steampowered.com/app/2925120/The_Pale_Piper/)
-
-## License
-Licensed under the MIT license, see `LICENSE` for more information.
