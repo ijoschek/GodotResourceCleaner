@@ -30,6 +30,20 @@ const EXCLUDE_FOLDER_DEFAULT := [".godot", "addons", ".git"]
 const EXCLUDE_EXT_DEFAULT := [".godot", ".import", ".uid"]
 const EXCLUDE_CONTAINING_DEFAULT := ["gitignore", "gitattributes"]
 
+## Main Screen
+@onready var main: PanelContainer = %Main
+@onready var setting: PanelContainer = %Setting
+@onready var keep_list: PanelContainer = %KeepList
+@onready var overlay: ColorRect = %Overlay
+
+## Overlay screen nodes
+@onready var progress_bar: ProgressBar
+@onready var progress_label: Label
+@onready var cancel_button: Button
+
+## Setting screen nodes
+@onready var use_multithreading_check_button: CheckButton = %UseMultithreadingCheckButton
+
 var exclude_folder := []
 var exclude_ext := []
 var exclude_containing := []
@@ -45,23 +59,37 @@ var unused_files := []
 var selected_count := 0
 var filter_on := false
 var ignore_on := false
+var use_multithreading := true
+var is_scanning := false
 
 func _ready() -> void:
-	var theme_icon := EditorInterface.get_base_control()
-	%ButtonSetting.icon = theme_icon.get_theme_icon("Tools", "EditorIcons")
-	%ButtonKeepList.icon = theme_icon.get_theme_icon("FileList", "EditorIcons")
-	%ButtonScan.icon = theme_icon.get_theme_icon("Search", "EditorIcons")
-	%ButtonClean.icon = theme_icon.get_theme_icon("Clear", "EditorIcons")
-	%ButtonKeep.icon = theme_icon.get_theme_icon("Pin", "EditorIcons")
-	%ButtonDelete.icon = theme_icon.get_theme_icon("Remove", "EditorIcons")
-	%ButtonDoneSetting.icon = theme_icon.get_theme_icon("Back", "EditorIcons")
-	%ButtonDoneKL.icon = theme_icon.get_theme_icon("Back", "EditorIcons")
-	%ButtonSettingReset.icon = theme_icon.get_theme_icon("Reload", "EditorIcons")
-	%ExcludeButton.icon = theme_icon.get_theme_icon("NodeWarning", "EditorIcons")
-	%ButtonRemoveAll.icon = theme_icon.get_theme_icon("Remove", "EditorIcons")
+	
+	use_multithreading_check_button.button_pressed = use_multithreading
+	if Engine.is_editor_hint():
+		var theme_icon := EditorInterface.get_base_control()
+		%ButtonSetting.icon = theme_icon.get_theme_icon("Tools", "EditorIcons")
+		%ButtonKeepList.icon = theme_icon.get_theme_icon("FileList", "EditorIcons")
+		%ButtonScan.icon = theme_icon.get_theme_icon("Search", "EditorIcons")
+		%ButtonClean.icon = theme_icon.get_theme_icon("Clear", "EditorIcons")
+		%ButtonKeep.icon = theme_icon.get_theme_icon("Pin", "EditorIcons")
+		%ButtonDelete.icon = theme_icon.get_theme_icon("Remove", "EditorIcons")
+		%ButtonDoneSetting.icon = theme_icon.get_theme_icon("Back", "EditorIcons")
+		%ButtonDoneKL.icon = theme_icon.get_theme_icon("Back", "EditorIcons")
+		%ButtonSettingReset.icon = theme_icon.get_theme_icon("Reload", "EditorIcons")
+		%ExcludeButton.icon = theme_icon.get_theme_icon("NodeWarning", "EditorIcons")
+		%ButtonRemoveAll.icon = theme_icon.get_theme_icon("Remove", "EditorIcons")
 	
 	%HBoxFilter.visible = filter_on
 	%VBoxIgnore.visible = ignore_on
+	main.visible = true
+	overlay.visible = false
+	setting.visible = false
+	
+	# Setup progress UI elements
+	_setup_progress_ui()
+	
+	# Connect to FileUtils progress signal
+	FileUtils.get_instance().progress_updated.connect(_on_scan_progress_updated)
 	
 	if ProjectSettings.has_setting(SETTING_KEEP_LIST):
 		keep_paths = ProjectSettings.get(SETTING_KEEP_LIST)
@@ -73,6 +101,59 @@ func _ready() -> void:
 	_load_exceptions_wdefault(SETTING_EXCLUDE_FOLDER, EXCLUDE_FOLDER_DEFAULT, Exception.EXCL_FOLDER)
 	_load_exceptions_wdefault(SETTING_EXCLUDE_EXT, EXCLUDE_EXT_DEFAULT, Exception.EXCL_EXTENSION)
 	_load_exceptions_wdefault(SETTING_EXCLUDE_CONTAINING, EXCLUDE_CONTAINING_DEFAULT, Exception.EXCL_CONTAINING)
+
+func _setup_progress_ui() -> void:
+	# Find or create progress bar and label
+	progress_bar = %ProgressBar if has_node("%ProgressBar") else null
+	progress_label = %ProgressLabel if has_node("%ProgressLabel") else null
+	cancel_button = %CancelButton if has_node("%CancelButton") else null
+	
+	if cancel_button:
+		cancel_button.pressed.connect(_on_cancel_scan_pressed)
+	
+	_hide_progress_ui()
+
+func _hide_progress_ui() -> void:
+	overlay.visible = false
+	if progress_bar:
+		progress_bar.visible = false
+	if progress_label:
+		progress_label.visible = false
+	if cancel_button:
+		cancel_button.visible = false
+
+func _show_progress_ui() -> void:
+	overlay.visible = true
+	if progress_bar:
+		progress_bar.visible = true
+		progress_bar.value = 0
+	if progress_label:
+		progress_label.visible = true
+		progress_label.text = "Starting scan..."
+	if cancel_button:
+		cancel_button.visible = true
+
+func _on_scan_progress_updated(current: int, total: int, message: String) -> void:
+	# Use call_deferred to ensure UI updates happen on the main thread
+	_update_progress_ui.call_deferred(current, total, message)
+
+func _update_progress_ui(current: int, total: int, message: String) -> void:
+	if progress_bar:
+		progress_bar.value = (float(current) / total) * 100
+	if progress_label:
+		progress_label.text = message
+
+func _on_cancel_scan_pressed() -> void:
+	if is_scanning:
+		FileUtils.cancel_scan()
+		is_scanning = false
+		_update_scan_cancelled_ui.call_deferred()
+
+func _update_scan_cancelled_ui() -> void:
+	%ButtonScan.disabled = false
+	_hide_progress_ui()
+	if progress_label:
+		progress_label.text = "Scan cancelled"
 			
 func _load_exceptions(setting: String, type: Exception) -> void:
 	if not ProjectSettings.has_setting(setting):
@@ -101,7 +182,41 @@ func _on_button_keep_list_pressed() -> void:
 
 # Press Scan Button
 func _on_button_scan_pressed() -> void:
-	_refresh()
+	if is_scanning:
+		return
+		
+	is_scanning = true
+	%ButtonScan.disabled = true
+	_show_progress_ui()
+	
+	# Run the scan in a separate thread to avoid blocking the UI
+	var scan_thread = Thread.new()
+	scan_thread.start(_perform_scan_async)
+
+func _perform_scan_async() -> void:
+	selected_count = 0
+	unused_files = FileUtils.scan_res(
+			filter_on,
+			search_ext,
+			exclude_folder,
+			exclude_ext,
+			exclude_containing,
+			keep_paths,
+			ignore_on,
+			ignore_folder,
+			ignore_ext,
+			use_multithreading) # Use threading
+	
+	# Switch back to main thread for UI updates
+	_on_scan_completed.call_deferred()
+
+func _on_scan_completed() -> void:
+	is_scanning = false
+	%ButtonScan.disabled = false
+	_hide_progress_ui()
+	
+	FileUtils.sorting(unused_files, sort)
+	_draw_result()
 	
 # Press Clean import Button
 func _on_button_clean_pressed() -> void:
@@ -142,7 +257,8 @@ func _refresh() -> void:
 			keep_paths,
 			ignore_on,
 			ignore_folder,
-			ignore_ext)
+			ignore_ext,
+			false) # Use single-threaded for refresh (for simplicity)
 	FileUtils.sorting(unused_files, sort)
 	_draw_result()
 
@@ -270,8 +386,9 @@ func _add_row(ndf: Dictionary) -> HBoxContainer:
 	hbox.add_child(s_label)
 	hbox.add_child(p_label)
 	
-	var preview = EditorInterface.get_resource_previewer()
-	preview.queue_resource_preview(ndf.path, self, "_on_preview_ready", tex_rec)
+	if Engine.is_editor_hint():
+		var preview = EditorInterface.get_resource_previewer()
+		preview.queue_resource_preview(ndf.path, self, "_on_preview_ready", tex_rec)
 	
 	return hbox
 
@@ -355,7 +472,9 @@ func on_checkbox_toggled(toggled_on: bool, ext: String) -> void:
 func _add_exception(txt: String, exception: Exception, save: bool) -> void:
 	var hbox := HBoxContainer.new()
 	var new_button := Button.new()
-	new_button.icon = EditorInterface.get_base_control().get_theme_icon("Remove", "EditorIcons")#"Del"
+	
+	if Engine.is_editor_hint(): new_button.icon = EditorInterface.get_base_control().get_theme_icon("Remove", "EditorIcons")#"Del"
+	
 	new_button.pressed.connect(_on_delete_exception.bind(exception, txt, hbox))
 	var new_sep := VSeparator.new()
 	var new_label := Label.new()
