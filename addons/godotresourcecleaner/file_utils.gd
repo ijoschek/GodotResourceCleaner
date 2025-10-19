@@ -31,9 +31,31 @@ static func scan_res(
 			use_threading: bool = true) -> Array:
 	
 	if use_threading:
-		return scan_res_threaded(filter_on, search_ext, exclude_folder, exclude_ext, exclude_containing, keep_paths, ignore_on, ignore_folder, ignore_ext)
+		print("Start Multithreaded Scan...")
+		return scan_res_threaded(
+				filter_on,
+				search_ext,
+				exclude_folder,
+				exclude_ext,
+				exclude_containing,
+				keep_paths,
+				ignore_on,
+				ignore_folder,
+				ignore_ext
+		)
 	else:
-		return scan_res_single_threaded(filter_on, search_ext, exclude_folder, exclude_ext, exclude_containing, keep_paths, ignore_on, ignore_folder, ignore_ext)
+		print("Start Singletreaded Scan...")
+		return scan_res_single_threaded(
+				filter_on,
+				search_ext,
+				exclude_folder,
+				exclude_ext,
+				exclude_containing,
+				keep_paths,
+				ignore_on,
+				ignore_folder,
+				ignore_ext
+		)
 
 static func scan_res_single_threaded(
 			filter_on: bool,
@@ -91,7 +113,7 @@ static func scan_res_threaded(
 			ignore_on: bool,
 			ignore_folder: Array,
 			ignore_ext: Array) -> Array:
-	
+		
 	var instance = get_instance()
 	_should_cancel = false
 	
@@ -208,9 +230,9 @@ static func _get_files_in_single_directory(
 			break
 		if dir_name in [".", ".."]:
 			continue
-
+		
 		var full_path := root.path_join(dir_name)
-
+		
 		# Only process files, not subdirectories (subdirectories are handled separately)
 		if not dir.current_is_dir():
 			if not has_extension(dir_name, exclude_ext) and not contains_any(full_path, exclude_containing):
@@ -343,32 +365,32 @@ static func _file_scan_worker(data: Dictionary) -> void:
 	_mutex.lock()
 	results[thread_id] = thread_result
 	_mutex.unlock()
-	
+
 static func contains_any(target: String, list: Array) -> bool:
 	for sub in list:
 		if target.contains(sub):
 			return true
 	return false
-	
+
 static func is_in_list(target: String, list: Array) -> bool:
 	for item in list:
 		if target == item:
 			return true
 	return false
-	
+
 static func has_extension(path: String, list: Array) -> bool:
 	for ext in list:
 		if path.ends_with(ext):
 			return true
 	return false
-	
+
 static func has_folder(path: String, list: Array) -> bool:
 	var segments = path.replace("res://", "").split("/")
 	for folder in list:
 		if folder in segments:
 			return true
 	return false
-	
+
 static func collect_all_dependencies(paths: Array) -> Array:
 	var all_deps := []
 	for p in paths:
@@ -521,20 +543,23 @@ static func _cleanup_threads() -> void:
 	if not _mutex:
 		return
 		
+	var threads_to_wait : Array
 	_mutex.lock()
-	var threads_to_wait = _active_threads.duplicate()
+	threads_to_wait = _active_threads.duplicate()
+	_active_threads.clear()
 	_mutex.unlock()
 	
 	# Wait for all active threads to complete
 	for thread in threads_to_wait:
-		if thread.is_alive():
-			thread.wait_to_finish()
+		if thread and thread is Thread:
+			if thread.is_alive():
+				thread.wait_to_finish()
+			thread = null  # Explicitly release reference
 	
 	_mutex.lock()
 	_active_threads.clear()
 	_mutex.unlock()
-	
-	
+
 static func sorting(no_dependency_files: Array, sort: int) -> void:
 	if no_dependency_files.is_empty():
 		return
@@ -603,12 +628,12 @@ static func clean_import(root: String, exclude_folder: Array) -> void:
 	var deleted_count := [0]  # use an array to pass by reference
 	_clean_orphaned_files(root, ".import", exclude_folder, deleted_count)
 	print("Deleted %d orphaned .import files" % deleted_count[0])
-	
+
 static func clean_uid(root: String, exclude_folder: Array) -> void:
 	var deleted_count := [0]  # use an array to pass by reference
 	_clean_orphaned_files(root, ".uid", exclude_folder, deleted_count)
 	print("Deleted %d orphaned .uid files" % deleted_count[0])
-	
+
 static func _clean_orphaned_files(root: String, extension: String, exclude_folder: Array, count: Array) -> void:
 	var dir := DirAccess.open(root)
 	if not dir:
@@ -637,8 +662,7 @@ static func _clean_orphaned_files(root: String, extension: String, exclude_folde
 				else:
 					print("Failed to delete:", path)
 	dir.list_dir_end()
-	
-	
+
 static func clean_empty_folders(root: String, exclude_folder: Array) -> void:
 	var deleted_count := [0]  # use an array to pass by reference
 	_remove_empty_dirs(root, exclude_folder, deleted_count)
@@ -675,14 +699,14 @@ static func _remove_empty_dirs(root: String, exclude_folder: Array, deleted_coun
 			print("Deleted empty folder:", root)
 		return true
 	return false
-	
+
 static func get_file_size(path: String) -> int:
 	if FileAccess.file_exists(path):
 		var file = FileAccess.open(path, FileAccess.READ)
 		if file:
 			return file.get_length()
 	return 0
-	
+
 static func format_file_size(bytes: int) -> String:
 	if bytes >= 1_073_741_824:
 		return "%.1f GB" % (bytes / 1_073_741_824.0)
