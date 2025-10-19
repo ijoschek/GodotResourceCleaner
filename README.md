@@ -60,4 +60,4 @@ A clean project means less storage usage, smaller exports, faster loading times,
 
 ## Disclaimer:
 
-⚠️ Use with caution and always make a backup before using this tool!
+⚠️ Use with caution and always make a backup before using this tool. This feature is provided as-is, without any warranty of any kind.
