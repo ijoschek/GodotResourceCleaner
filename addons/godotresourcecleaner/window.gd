@@ -19,6 +19,7 @@ enum Exception {
 	EXCL_CONTAINING,
 }
 
+const SETTING_USE_MULTITHREADING := "ResCleaner/data/use_multithreading"
 const SETTING_KEEP_LIST := "ResCleaner/data/keep_list"
 const SETTING_IGNORE_FOLDER := "ResCleaner/data/ignore_folder"
 const SETTING_IGNORE_EXT := "ResCleaner/data/ignore_ext"
@@ -35,11 +36,12 @@ const EXCLUDE_CONTAINING_DEFAULT := ["gitignore", "gitattributes"]
 @onready var setting: PanelContainer = %Setting
 @onready var keep_list: PanelContainer = %KeepList
 @onready var overlay: ColorRect = %Overlay
+@onready var button_scan: Button = %ButtonScan
 
 ## Overlay screen nodes
-@onready var progress_bar: ProgressBar
-@onready var progress_label: Label
-@onready var cancel_button: Button
+@onready var progress_bar: ProgressBar = %ProgressBar
+@onready var progress_label: Label = %ProgressLabel
+@onready var cancel_button: Button = %CancelButton
 
 ## Setting screen nodes
 @onready var use_multithreading_check_button: CheckButton = %UseMultithreadingCheckButton
@@ -56,6 +58,8 @@ var search_ext : Array[String] = []
 var keep_paths : Array[String] = []
 var unused_files := []
 
+var scan_thread : Thread
+
 var selected_count := 0
 var filter_on := false
 var ignore_on := false
@@ -63,13 +67,11 @@ var use_multithreading := true
 var is_scanning := false
 
 func _ready() -> void:
-	
-	use_multithreading_check_button.button_pressed = use_multithreading
 	if Engine.is_editor_hint():
 		var theme_icon := EditorInterface.get_base_control()
 		%ButtonSetting.icon = theme_icon.get_theme_icon("Tools", "EditorIcons")
 		%ButtonKeepList.icon = theme_icon.get_theme_icon("FileList", "EditorIcons")
-		%ButtonScan.icon = theme_icon.get_theme_icon("Search", "EditorIcons")
+		button_scan.icon = theme_icon.get_theme_icon("Search", "EditorIcons")
 		%ButtonClean.icon = theme_icon.get_theme_icon("Clear", "EditorIcons")
 		%ButtonKeep.icon = theme_icon.get_theme_icon("Pin", "EditorIcons")
 		%ButtonDelete.icon = theme_icon.get_theme_icon("Remove", "EditorIcons")
@@ -86,32 +88,27 @@ func _ready() -> void:
 	setting.visible = false
 	
 	# Setup progress UI elements
-	_setup_progress_ui()
+	cancel_button.pressed.connect(_on_cancel_scan_pressed)
+	_hide_progress_ui()
 	
 	# Connect to FileUtils progress signal
 	FileUtils.get_instance().progress_updated.connect(_on_scan_progress_updated)
 	
+	# Load Settings
 	if ProjectSettings.has_setting(SETTING_KEEP_LIST):
 		keep_paths = ProjectSettings.get(SETTING_KEEP_LIST)
 		for path in keep_paths:
 			%VBoxKeepList.add_child(_add_keep_list_row(path))
+			
+	if ProjectSettings.has_setting(SETTING_USE_MULTITHREADING):
+		use_multithreading = ProjectSettings.get(SETTING_USE_MULTITHREADING)
+	use_multithreading_check_button.button_pressed = use_multithreading
 		
 	_load_exceptions(SETTING_IGNORE_FOLDER, Exception.IGN_FOLDER)
 	_load_exceptions(SETTING_IGNORE_EXT, Exception.IGN_EXTENSION)
 	_load_exceptions_wdefault(SETTING_EXCLUDE_FOLDER, EXCLUDE_FOLDER_DEFAULT, Exception.EXCL_FOLDER)
 	_load_exceptions_wdefault(SETTING_EXCLUDE_EXT, EXCLUDE_EXT_DEFAULT, Exception.EXCL_EXTENSION)
 	_load_exceptions_wdefault(SETTING_EXCLUDE_CONTAINING, EXCLUDE_CONTAINING_DEFAULT, Exception.EXCL_CONTAINING)
-
-func _setup_progress_ui() -> void:
-	# Find or create progress bar and label
-	progress_bar = %ProgressBar if has_node("%ProgressBar") else null
-	progress_label = %ProgressLabel if has_node("%ProgressLabel") else null
-	cancel_button = %CancelButton if has_node("%CancelButton") else null
-	
-	if cancel_button:
-		cancel_button.pressed.connect(_on_cancel_scan_pressed)
-	
-	_hide_progress_ui()
 
 func _hide_progress_ui() -> void:
 	overlay.visible = false
@@ -146,27 +143,30 @@ func _update_progress_ui(current: int, total: int, message: String) -> void:
 func _on_cancel_scan_pressed() -> void:
 	if is_scanning:
 		FileUtils.cancel_scan()
+		if scan_thread:
+			scan_thread.wait_to_finish()
+			scan_thread = null
 		is_scanning = false
 		_update_scan_cancelled_ui.call_deferred()
 
 func _update_scan_cancelled_ui() -> void:
-	%ButtonScan.disabled = false
+	button_scan.disabled = false
 	_hide_progress_ui()
 	if progress_label:
 		progress_label.text = "Scan cancelled"
-			
+
 func _load_exceptions(setting: String, type: Exception) -> void:
 	if not ProjectSettings.has_setting(setting):
 		return
 	var items : Array = ProjectSettings.get(setting)
 	for i in items:
 		_add_exception(i, type, false)
-		
+
 func _load_exceptions_wdefault(setting: String, default_list: Array, type: Exception) -> void:
 	var items : Array = ProjectSettings.get(setting) if ProjectSettings.has_setting(setting) else default_list
 	for i in items:
 		_add_exception(i, type, false)
-		
+
 #region Main
 # Close Plugin
 func _on_close_requested() -> void:
@@ -186,11 +186,11 @@ func _on_button_scan_pressed() -> void:
 		return
 		
 	is_scanning = true
-	%ButtonScan.disabled = true
+	button_scan.disabled = true
 	_show_progress_ui()
 	
 	# Run the scan in a separate thread to avoid blocking the UI
-	var scan_thread = Thread.new()
+	scan_thread = Thread.new()
 	scan_thread.start(_perform_scan_async)
 
 func _perform_scan_async() -> void:
@@ -212,12 +212,16 @@ func _perform_scan_async() -> void:
 
 func _on_scan_completed() -> void:
 	is_scanning = false
-	%ButtonScan.disabled = false
+	button_scan.disabled = false
 	_hide_progress_ui()
 	
 	FileUtils.sorting(unused_files, sort)
 	_draw_result()
 	
+	if scan_thread:
+		scan_thread.wait_to_finish()
+		scan_thread = null
+
 # Press Clean import Button
 func _on_button_clean_pressed() -> void:
 	%CBImport.button_pressed = true
@@ -226,12 +230,19 @@ func _on_button_clean_pressed() -> void:
 	%ConfirmationDialogClean.show()
 	
 func _on_confirmation_dialog_clean_confirmed() -> void:
+	var any_clean := false
 	if %CBImport.button_pressed:
+		any_clean = true
 		FileUtils.clean_import("res://", exclude_folder)
 	if %CBUid.button_pressed:
+		any_clean = true
 		FileUtils.clean_uid("res://", exclude_folder)
 	if %CBFolders.button_pressed:
+		any_clean = true
 		FileUtils.clean_empty_folders("res://", exclude_folder)
+		
+	if any_clean:
+		_refresh_filesystem()
 	
 # Press Sort Size Button
 func _on_size_button_pressed() -> void:
@@ -258,19 +269,23 @@ func _refresh() -> void:
 			ignore_on,
 			ignore_folder,
 			ignore_ext,
-			false) # Use single-threaded for refresh (for simplicity)
+			use_multithreading)
 	FileUtils.sorting(unused_files, sort)
 	_draw_result()
+
+func _refresh_filesystem() -> void:
+	print("REFRESH FILESYS")
+	EditorInterface.get_resource_filesystem().scan()
 
 # Checkbox logic
 func _on_first_checkbox_toggled(is_toggled: bool) -> void:
 	for file in unused_files:
 		file.checkbox.button_pressed = is_toggled
-	
+
 func _on_checkbox_toggled(is_toggled: bool, file: Dictionary) -> void:
 	file.is_checked = is_toggled
 	selected_count += 1 if is_toggled else -1
-	
+
 # Press Keep Files Button
 func _on_button_keep_pressed() -> void:
 	if unused_files.is_empty():
@@ -308,6 +323,7 @@ func _on_button_delete_pressed() -> void:
 # Actually Delete selected Files
 func _on_confirmation_dialog_confirmed() -> void:
 	FileUtils.delete_selected(unused_files)
+	_refresh_filesystem()
 	_refresh()
 	
 # Filter File Paths
@@ -348,11 +364,13 @@ func _add_first_row() -> HBoxContainer:
 	
 	var s_button := Button.new()
 	s_button.text = "Size"
+	s_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	s_button.custom_minimum_size.x = 80.0
 	s_button.pressed.connect(_on_size_button_pressed)
 	
 	var p_button := Button.new()
 	p_button.text = "Path"
+	p_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	p_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	p_button.pressed.connect(_on_path_button_pressed)
 	
@@ -561,7 +579,13 @@ func _on_button_ign_ext_pressed() -> void:
 	if not txt.is_empty():
 		%TextEditIgnExt.text = ""
 		_add_exception(txt, Exception.IGN_EXTENSION, true)
+
+func _on_use_multithreading_check_button_toggled(toggled_on: bool) -> void:
+	use_multithreading = toggled_on
 	
+	ProjectSettings.set(SETTING_USE_MULTITHREADING, use_multithreading)
+	ProjectSettings.save()
+
 # Exclude Section
 func _on_exclude_check_button_toggled(toggled_on: bool) -> void:
 	%VBoxExclude.visible = toggled_on

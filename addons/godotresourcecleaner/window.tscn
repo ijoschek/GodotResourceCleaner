@@ -1,14 +1,7 @@
-[gd_scene load_steps=13 format=3 uid="uid://wtvvtdcms4ax"]
+[gd_scene load_steps=12 format=3 uid="uid://wtvvtdcms4ax"]
 
-[ext_resource type="Script" uid="uid://cb7gvapdlv7e2" path="res://addons/godotresourcecleaner/window.gd" id="1_p0mwy"]
-[ext_resource type="Script" uid="uid://bfokw5a65voxd" path="res://addons/godotresourcecleaner/grid_container.gd" id="2_rch45"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7peqy"]
-content_margin_left = 15.0
-content_margin_top = 15.0
-content_margin_right = 15.0
-content_margin_bottom = 15.0
-bg_color = Color(0.17641908, 0.17641911, 0.17641899, 1)
+[ext_resource type="Script" uid="uid://b5b8w5appi7jq" path="res://addons/godotresourcecleaner/window.gd" id="1_p0mwy"]
+[ext_resource type="Script" uid="uid://cv0p2lykupdql" path="res://addons/godotresourcecleaner/grid_container.gd" id="2_rch45"]
 
 [sub_resource type="DPITexture" id="DPITexture_7peqy"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M4 1 3 3l1 2v4H2v3.5a2.5 2.5 0 0 0 5 0V9H5V5l1-2-1-2zm6 .174a3 3 0 0 0 0 5.652V14a1 1 0 0 0 2 0V6.824a3 3 0 0 0 0-5.648V4a1 1 0 0 1-2 0z\"/></svg>
@@ -106,8 +99,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_7peqy")
-metadata/_edit_lock_ = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Main"]
 layout_mode = 2
@@ -161,20 +152,25 @@ layout_mode = 2
 text = "Clean"
 icon = SubResource("DPITexture_ujiyn")
 
-[node name="Panel2" type="PanelContainer" parent="Main/VBoxContainer"]
+[node name="Panel" type="Panel" parent="Main/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Main/VBoxContainer/Panel2"]
-layout_mode = 2
+[node name="ScrollContainer" type="ScrollContainer" parent="Main/VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxMain" type="VBoxContainer" parent="Main/VBoxContainer/Panel2/ScrollContainer"]
+[node name="VBoxMain" type="VBoxContainer" parent="Main/VBoxContainer/Panel/ScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="Main/VBoxContainer/Panel2/ScrollContainer/VBoxMain"]
+[node name="Label" type="Label" parent="Main/VBoxContainer/Panel/ScrollContainer/VBoxMain"]
 layout_mode = 2
 text = "⚠️ Use With Caution ⚠️
 Deletion of files is permanent!
@@ -183,10 +179,15 @@ Even if a file has no visible dependencies, it may still be referenced.
 This tool can break your project. Use at your own risk!"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="Main/VBoxContainer/Panel2/ScrollContainer/VBoxMain"]
+[node name="HSeparator" type="HSeparator" parent="Main/VBoxContainer/Panel/ScrollContainer/VBoxMain"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="Main/VBoxContainer/Panel2/ScrollContainer/VBoxMain"]
+[node name="MarginContainer" type="MarginContainer" parent="Main/VBoxContainer/Panel/ScrollContainer/VBoxMain"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="Label2" type="Label" parent="Main/VBoxContainer/Panel/ScrollContainer/VBoxMain/MarginContainer"]
 layout_mode = 2
 text = "⚙️ Settings:
 Customize the scan behavior if needed.
@@ -197,10 +198,15 @@ Scans the project for unused files and resources with no known dependencies.
 🧹 Clean: 
 Finds and removes orphaned .import, .uid files, and empty folders."
 
-[node name="HSeparator2" type="HSeparator" parent="Main/VBoxContainer/Panel2/ScrollContainer/VBoxMain"]
+[node name="HSeparator2" type="HSeparator" parent="Main/VBoxContainer/Panel/ScrollContainer/VBoxMain"]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="Main/VBoxContainer/Panel2/ScrollContainer/VBoxMain"]
+[node name="MarginContainer2" type="MarginContainer" parent="Main/VBoxContainer/Panel/ScrollContainer/VBoxMain"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="Label3" type="Label" parent="Main/VBoxContainer/Panel/ScrollContainer/VBoxMain/MarginContainer2"]
 layout_mode = 2
 text = "🛠️ How It Works 🛠️
 📋 Press Scan to find unused resources.
@@ -209,14 +215,15 @@ text = "🛠️ How It Works 🛠️
 🗑️ Use Delete to permanently remove them.
 🧹 Optionally press Clean to remove orphaned files and empty folders."
 
-[node name="HSeparator3" type="HSeparator" parent="Main/VBoxContainer/Panel2/ScrollContainer/VBoxMain"]
+[node name="HSeparator3" type="HSeparator" parent="Main/VBoxContainer/Panel/ScrollContainer/VBoxMain"]
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="Main/VBoxContainer/Panel2/ScrollContainer/VBoxMain"]
+[node name="Label4" type="Label" parent="Main/VBoxContainer/Panel/ScrollContainer/VBoxMain"]
 layout_mode = 2
-text = "🛈 Godot Resource Cleaner v0.7
+text = "🛈 Godot Resource Cleaner v0.7.1
 Licensed under the MIT License.
 © 2025 FreeTimeDev"
+horizontal_alignment = 1
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Main/VBoxContainer"]
 layout_mode = 2
@@ -244,10 +251,6 @@ visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 4.0
-offset_right = -8.0
-offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -270,10 +273,12 @@ text = "Done"
 icon = SubResource("DPITexture_slwqc")
 
 [node name="VSeparator" type="VSeparator" parent="Setting/VBoxContainer/HBoxContainer"]
+visible = false
 layout_mode = 2
 
 [node name="ButtonSettingReset" type="Button" parent="Setting/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "Reset"
 icon = SubResource("DPITexture_71fj7")
@@ -588,15 +593,14 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 tooltip_text = "Enable Multithreading
+Speeds up file scanning by using multiple CPU cores
+Best for large projects with many files.
 
-Uses multiple CPU cores to scan files faster. Recommended for large projects with many files and it can be 2-4x faster scanning on multi-core systems
-
-Warnings:
-• May use more CPU and memory during scanning
-• Small projects might not see significant improvement
-• Disable if experiencing stability issues
-
-Note: Single-threaded mode is more predictable but slower for large projects."
+Notes:
+• Increases CPU and memory usage during scans
+• Small projects may see little benefit
+• Disable if you encounter crashes or instability"
+button_pressed = true
 text = "Use Multithreading ⚠️"
 
 [node name="HSeparator3" type="HSeparator" parent="Setting/VBoxContainer/ScrollContainer/VBoxContainer"]
@@ -745,10 +749,6 @@ visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 4.0
-offset_right = -8.0
-offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -808,43 +808,64 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.019607844, 0.019607844, 0.019607844, 0.8)
 
-[node name="CenterContainer" type="CenterContainer" parent="Overlay"]
+[node name="PanelContainer" type="PanelContainer" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -64.0
+offset_right = 210.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Overlay/PanelContainer"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Overlay/PanelContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
-[node name="ProgressContainer" type="VBoxContainer" parent="Overlay/CenterContainer"]
+[node name="ProgressContainer" type="VBoxContainer" parent="Overlay/PanelContainer/Panel/MarginContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Overlay/CenterContainer/ProgressContainer"]
-layout_mode = 2
-
-[node name="ProgressLabel" type="Label" parent="Overlay/CenterContainer/ProgressContainer/HBoxContainer"]
+[node name="ProgressLabel" type="Label" parent="Overlay/PanelContainer/Panel/MarginContainer/ProgressContainer"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Scanning..."
+text = "Scan complete!"
 horizontal_alignment = 1
 
-[node name="CancelButton" type="Button" parent="Overlay/CenterContainer/ProgressContainer/HBoxContainer"]
+[node name="ProgressBar" type="ProgressBar" parent="Overlay/PanelContainer/Panel/MarginContainer/ProgressContainer"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+value = 100.0
+
+[node name="HSeparator" type="HSeparator" parent="Overlay/PanelContainer/Panel/MarginContainer/ProgressContainer"]
+layout_mode = 2
+
+[node name="CancelButton" type="Button" parent="Overlay/PanelContainer/Panel/MarginContainer/ProgressContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
 text = "Cancel"
-
-[node name="ProgressBar" type="ProgressBar" parent="Overlay/CenterContainer/ProgressContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-show_percentage = false
-
-[node name="HSeparator" type="HSeparator" parent="Overlay/CenterContainer/ProgressContainer"]
-layout_mode = 2
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
 unique_name_in_owner = true
@@ -920,6 +941,7 @@ dialog_autowrap = true
 [connection signal="toggled" from="Setting/VBoxContainer/ScrollContainer/VBoxContainer/IgnoreCheckButton" to="." method="_on_ignore_check_button_toggled"]
 [connection signal="pressed" from="Setting/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer/HBoxContainer/Button" to="." method="_on_button_ign_folder_pressed"]
 [connection signal="pressed" from="Setting/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer2/HBoxContainer/Button" to="." method="_on_button_ign_ext_pressed"]
+[connection signal="toggled" from="Setting/VBoxContainer/ScrollContainer/VBoxContainer/UseMultithreadingCheckButton" to="." method="_on_use_multithreading_check_button_toggled"]
 [connection signal="toggled" from="Setting/VBoxContainer/ScrollContainer/VBoxContainer/ExcludeButton" to="." method="_on_exclude_check_button_toggled"]
 [connection signal="pressed" from="Setting/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/Button" to="." method="_on_button_exclude_folder_pressed"]
 [connection signal="pressed" from="Setting/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer2/VBoxContainer/HBoxContainer/Button" to="." method="_on_button_exclude_ext_pressed"]
