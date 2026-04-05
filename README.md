@@ -50,6 +50,13 @@ A clean project means less storage usage, smaller exports, faster loading times,
 - Extract the zip file and place the `godotresourcecleaner` folder inside your project’s `addons` directory.
 - Enable the plugin inside `Project > Project Settings > Plugins`.
 
+## Godot 3.x Support
+
+If you are using Godot 3.x, a community-maintained compatible version is available here:
+https://github.com/navinmotion/GodotResourceCleaner/tree/godot-3.x
+
+Huge thanks to @navinmotion for creating and sharing this branch.
+
 ## Usage:
 
 - After enabling the plugin, open Godot Resource Cleaner from the top-right corner of the editor.
