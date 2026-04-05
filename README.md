@@ -59,7 +59,7 @@ A clean project means less storage usage, smaller exports, faster loading times,
 If you are using Godot 3.x, a community-maintained compatible version is available here:
 https://github.com/navinmotion/GodotResourceCleaner/tree/godot-3.x
 
-Huge thanks to @navinmotion for creating and sharing this branch.
+Huge thanks to [@navinmotion](https://github.com/navinmotion) for creating and sharing this branch.
 
 ## Disclaimer:
 
